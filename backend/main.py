@@ -1,3 +1,5 @@
+# Deploying issues, using direct call now
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from modelling import price_optim
@@ -64,3 +66,4 @@ def price_optimization(request: PriceOptimRequest):
         "profit_list": profit_list,
         "predicted_demand": pred_demand
     }
+

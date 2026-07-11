@@ -1,6 +1,5 @@
-import requests
 import plotly.express as px
-from backend.modelling import Branch_IDs, Meal_IDs, Category, Cuisine
+from backend.modelling import Branch_IDs, Meal_IDs, Category, Cuisine, price_optim
 import streamlit as st
 import time
 import pandas as pd
@@ -40,7 +39,7 @@ def show():
     )
     discount_percent = st.sidebar.slider(
         "Set Discount Percent",
-        0, 70, 0
+        0, 70, 10
     )
     product_category = st.sidebar.selectbox(
         "Product Category",
@@ -53,45 +52,28 @@ def show():
     st.sidebar.subheader("Enter Price Percentage Increase")
     percent_increase = st.sidebar.slider(
         "Increase Percentage",
-        5, 50, 10
+        5, 50, 20
     )
 
     if st.sidebar.button("Run Optimization"):
-        # Send the data to the FastAPI backend for processing
+        # Call the modelling function directly
         try:
-            response = requests.post(
-            "http://127.0.0.1:8000/price_optim",
-            json={
-                "week": week,
-                "branch": branch,
-                "meal": meal,
-                "current_price": current_price,
-                "email_promo": email_promo,
-                "app_homepage_promo": app_homepage_promo,
-                "discount_percent": discount_percent,
-                "product_category": product_category,
-                "product_cuisine": product_cuisine,
-                "percent_increase": percent_increase
-            })
+            data = [
+                week, branch, meal, current_price,
+                email_promo, app_homepage_promo, discount_percent,
+                product_category, product_cuisine, percent_increase
+            ]
 
-            response.raise_for_status()
+            price_range, demand_list, profit_list, init_demand = price_optim(data)
 
-            results = response.json()
-
-            price_range = results["price_range"]
-            demand_list = results["demand_list"]
-            profit_list = results["profit_list"]
-            init_demand = results["predicted_demand"]
-
-
-            message = st.success("Response Received!")
+            message = st.success("Optimization Complete!")
 
             time.sleep(1)
 
             message.empty()
 
-        except requests.exceptions.RequestException as e:
-            st.error(f"Backend Error: {e}")
+        except Exception as e:
+            st.error(f"Error: {e}")
 
         # So what should we do with these data??
 
