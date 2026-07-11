@@ -3,3 +3,7 @@
 /Scripts/
 pyvenv.cfg
 __pycache__
+
+# Large model files
+backend/Artifacts/optim_model.pkl
+backend/Artifacts/preprocessor.pkl
